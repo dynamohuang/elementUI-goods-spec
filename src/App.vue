@@ -15,7 +15,7 @@
                 </el-select>
 
 
-                <el-select v-model="Spec.SpecValueList" multiple filterable allow-create value-key="name"
+                <el-select v-model="Spec.SpecValueList" multiple filterable default-first-option  allow-create value-key="name"
                            placeholder="请录入规格选项">
                 </el-select>
                 <el-button type="danger" icon="el-icon-delete" circle @click="delSpec($index)"></el-button>
@@ -42,26 +42,26 @@
                 <el-table-column
                         prop="address"
                         label="SKU"
-                        >
+                >
                 </el-table-column>
                 <el-table-column
                         prop="price"
                         label="价格（元)"
-                       >
+                >
                 </el-table-column>
                 <el-table-column
                         prop="name"
                         label="库存"
-                        >
+                >
                 </el-table-column>
-
             </el-table>
-
-
         </div>
 
-
+        <pre>
+        {{ validSpecList }}
+    </pre>
     </div>
+
 </template>
 
 <script>
@@ -83,41 +83,37 @@
                 }],
                 //用户输入数据
                 SpecList: [],
-                specDetailList:[]
+                specDetailList: []
 
             }
         },
 
         methods: {
-            addSpec:function(){
+            addSpec: function () {
                 let newSpec = {
                     SpecName: '',
                     SpecValueList: []
                 };
                 this.SpecList.push(newSpec);
             },
-            delSpec:function (index) {
+            delSpec: function (index) {
                 this.SpecList.splice(index, 1);
                 //:todo update table
-
-
             }
 
         },
         computed: {
-//            tags() {
-//                return this.value10.map(tag => {
-//                    if (typeof tag === 'string') {
-//                        return {
-//                            id: tag,
-//                            name: tag.toUpperCase(),
-//                            type: 'tag'
-//                        }
-//                    } else {
-//                        return tag
-//                    }
-//                })
-//            }
+            validSpecList: function () {
+                let validSpecList = [];
+                this.SpecList.forEach(
+                    function (element) {
+                        if(element.SpecName && element.SpecValueList.length>0){
+                            validSpecList.push(element);
+                        }
+                    }
+                );
+                return validSpecList;
+            }
         }
 
 
