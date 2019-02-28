@@ -3,7 +3,6 @@
 > A vue component for setting goods specifications in online-shop like  system
 
 ## Todo
-- 规格删除
 - 表格生成
 - 数据获取
 - 数据验证

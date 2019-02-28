@@ -18,7 +18,7 @@
                 <el-select v-model="Spec.SpecValueList" multiple filterable allow-create value-key="name"
                            placeholder="请录入规格选项">
                 </el-select>
-                <el-button type="danger" icon="el-icon-delete" circle></el-button>
+                <el-button type="danger" icon="el-icon-delete" circle @click="delSpec($index)"></el-button>
             </div>
             <el-button @click="addSpec()" type="primary"><i class="el-icon-plus"></i>添加规格项</el-button>
         </div>
@@ -89,16 +89,18 @@
         },
 
         methods: {
-            addSpec() {
+            addSpec:function(){
                 let newSpec = {
                     SpecName: '',
                     SpecValueList: []
                 };
                 this.SpecList.push(newSpec);
             },
-            delSpec() {
+            delSpec:function (index) {
+                this.SpecList.splice(index, 1);
+                //:todo update table
 
-//                this.SpecList.push(newSpec);
+
             }
 
         },
