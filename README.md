@@ -2,7 +2,7 @@
 
 > A vue component for setting goods specifications in online-shop like  system
 
-![avatar](https://s2.ax1x.com/2019/02/28/k7D379.jpg)
+![avatar](https://s2.ax1x.com/2019/03/01/kHB390.jpg)
 
 ## Todo
 - 表格生成
