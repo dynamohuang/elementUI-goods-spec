@@ -23,8 +23,10 @@
                   @keyup.enter.native="handleTagEditConfirm(tag)" @blur="handleTagEditConfirm(tag)"></el-input>
 </span>
 
-                <el-input class="input-new-tag" v-if="Spec.SpecTagAddVisible" v-model="Spec.SpecTagAddValue" ref="saveTagInput" size="small"
-                          @keyup.enter.native="handleInputConfirm(Spec.SpecTagAddValue,Spec)" @blur="handleInputConfirm(Spec.SpecTagAddValue,Spec)">
+                <el-input class="input-new-tag" v-if="Spec.SpecTagAddVisible" v-model="Spec.SpecTagAddValue"
+                          ref="saveTagInput" size="small"
+                          @keyup.enter.native="handleInputConfirm(Spec.SpecTagAddValue,Spec)"
+                          @blur="handleInputConfirm(Spec.SpecTagAddValue,Spec)">
                 </el-input>
                 <el-button v-else class="button-new-tag" size="small" @click="showInput(Spec)">+ 规格选项</el-button>
 
@@ -36,42 +38,22 @@
         <div>
             <h2>规格明细：</h2>
 
-            <el-table
-
-                    style="width: 100%">
-
-
+            <el-table :data="specDetailList"
+                      style="width: 100%">
                 <el-table-column
-                        v-for="Spec in SpecList"
-                        v-if="Spec.SpecName&&Spec.SpecTagList.length > 0"
-                        :label="Spec.SpecName"
-                        :prop="Spec.SpecName"
-                >
-                </el-table-column>
-
-
-                <el-table-column
-                        prop="address"
-                        label="SKU"
-                >
-                </el-table-column>
-                <el-table-column
-                        prop="price"
-                        label="价格（元)"
-                >
-                </el-table-column>
-                <el-table-column
-                        prop="name"
-                        label="库存"
+                        :prop="column.prop"
+                        :label="column.label"
+                        v-for="column in specDetailColumn"
                 >
                 </el-table-column>
             </el-table>
         </div>
 
         <pre>
-        {{ validSpecList }}
+        {{ specDetailList }}
     </pre>
     </div>
+
 
 </template>
 
@@ -94,8 +76,10 @@
                 }],
                 //用户输入数据
                 SpecList: [],
-//                specDetailList: [],
-
+                specDetailDefaultColumn: [{'prop': 'sku', 'label': 'sku'}, {
+                    'prop': 'price',
+                    'label': 'price'
+                }, {'prop': 'left', 'label': '库存'}],
 
 
             }
@@ -115,32 +99,35 @@
                 this.SpecList.splice(index, 1);
                 //:todo update table
             },
-            handleClose(tag,SpecTagList) {
+            handleClose(tag, SpecTagList) {
 
                 SpecTagList.splice(SpecTagList.indexOf(tag), 1);
             },
             handleEdit(tag) {
                 tag.editVisible = true;
-                this.$nextTick(_ => {
-                    this.$refs.saveTagInput.$refs.input.focus();
-                });
+//                this.$nextTick(function()  {
+////                    this.$refs.saveTagInput.first().focus();
+//                });
             },
 
             showInput(Spec) {
                 Spec.SpecTagAddVisible = true;
-                Spec.$nextTick(_ => {
-                    Spec.$refs.saveTagInput.$refs.input.focus();
-                });
+//                this.$nextTick(function ()  {
+//                    let input = this.$refs.saveTagInput;
+//
+//                    input[0].focus();
+//
+//                });
             },
 
             handleTagEditConfirm(tag) {
                 tag.editVisible = false;
             },
 
-            handleInputConfirm(inputValue,Spec) {
+            handleInputConfirm(inputValue, Spec) {
 
                 if (inputValue) {
-                    Spec.SpecTagList.push({'editVisible':false,'label':inputValue});
+                    Spec.SpecTagList.push({'editVisible': false, 'label': inputValue});
                 }
                 Spec.SpecTagAddVisible = false;
                 Spec.SpecTagAddValue = '';
@@ -148,18 +135,50 @@
 
         },
         computed: {
-            validSpecList: function () {
-                let validSpecList = [];
+            specDetailColumn: function () {
+
+                let specDetailColumn = JSON.parse(JSON.stringify(this.specDetailDefaultColumn));
                 this.SpecList.forEach(
                     function (element) {
                         if (element.SpecName && element.SpecTagList.length > 0) {
-                            validSpecList.push(element);
+                            specDetailColumn = [{
+                                'prop': element.SpecName,
+                                'label': element.SpecName,
+                                'diy': true
+                            }].concat(specDetailColumn);
                         }
                     }
                 );
-                return validSpecList;
+                return specDetailColumn;
+
+            },
+            specDetailList: function () {
+
+                let specDetailListOld = [{sku: '', price: '', left: ''}];
+                let specDetailList = JSON.parse(JSON.stringify(specDetailListOld));
+
+                this.SpecList.forEach(function (spec) {
+
+                    if (spec.SpecName && spec.SpecTagList.length > 0) {
+
+                         let specDetailListTmp = [];
+
+                        specDetailList.forEach(function (row) {
+                            spec.SpecTagList.forEach(function (SpecTag) {
+                                let newRow = JSON.parse(JSON.stringify(row));
+                                newRow[spec.SpecName] = SpecTag.label;
+                                specDetailListTmp.push(newRow);
+
+                            });
+                        });
+                        specDetailList = JSON.parse(JSON.stringify(specDetailListTmp));
+                    }
+                });
+                return specDetailList;
+
             }
-        }
+        },
+        watch: {}
 
 
     }
@@ -187,7 +206,7 @@
         padding-bottom: 0;
     }
 
-    .input-new-tag,.input-edit-tag {
+    .input-new-tag, .input-edit-tag {
         width: 90px;
         margin-left: 10px;
         vertical-align: bottom;
